@@ -19,3 +19,4 @@ docker_mount/
 /3rdparty/apex/
 
 *.log
+/logs/
