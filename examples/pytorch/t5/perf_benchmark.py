@@ -56,6 +56,12 @@ class TranslationResult(object):
         self.execution_time = 0.0  # seconds
         self.token_num = 0
 
+def true_random_tensor(low, high, size):
+    num_elements = np.prod(size)
+    random_bytes = os.urandom(num_elements * 8)
+    random_ints = np.frombuffer(random_bytes, dtype=np.int64) % (high - low) + low
+    return torch.tensor(random_ints, dtype=torch.int64).reshape(size)
+
 class InputTokens(object):
     def __init__(self, batch_size, input_seq_len, bos_token, eos_token, vocab_size):
         # Set the last token of each sequence to eos and replace the bos/eos tokens in the middle of the sequences to
@@ -66,6 +72,9 @@ class InputTokens(object):
         if eos_token in normal_token_list:
             normal_token_list.remove(eos_token)
         self.input_ids = torch.randint(0, len(normal_token_list), (batch_size, input_seq_len))
+        # print(f"Data type of self.input_ids: {self.input_ids[0][0].dtype}")
+        # self.input_ids = true_random_tensor(0, len(normal_token_list), (batch_size, input_seq_len))
+        # print(f"Data type of self.input_ids: {self.input_ids[0][0].dtype}")
         for batch_idx in range(batch_size):
             for token_idx in range(input_seq_len):
                 if token_idx == input_seq_len - 1:

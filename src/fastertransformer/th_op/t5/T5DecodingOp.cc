@@ -146,6 +146,9 @@ FTT5Decoding<T>::FTT5Decoding(int64_t                        head_num,
                         _weights.push_back(
                             create_tensor_from_bin<int8_t>(
                                 {expert_num, size_per_expert}, expert_filenames, false));
+                        // _weights.push_back(
+                        //     create_tensor_from_bin<int8_t>(
+                        //         {size_per_expert}, offload_path + "decoder::layer1expert26.bin", true));
                         decoder_layer_weights->ffn_weights.all_weight = get_ptr<int8_t>(_weights[_weights.size() - 1]);
                         return;
                     }
