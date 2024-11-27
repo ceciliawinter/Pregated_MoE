@@ -142,6 +142,8 @@ public:
                     ActivationType    fc1_activation_type,
                     const WeightType* fc2_expert_weights,
                     const T*          fc2_scales,
+                    const WeightType* fc1_expert_weights_stay_on_GPU,
+                    const WeightType* fc2_expert_weights_stay_on_GPU,
                     const int         num_rows,
                     const int         hidden_size,
                     const int         inter_size,
@@ -152,6 +154,7 @@ public:
                     T*                expert_scales,
                     int*              expanded_source_row_to_expanded_dest_row,
                     int*              expert_for_source_row,
+                    int layer_num,
                     cudaStream_t      stream);
 
     void run_moe_fc(const T*          input_activations,
@@ -162,6 +165,8 @@ public:
                     ActivationType    fc1_activation_type,
                     const WeightType* fc2_expert_weights,
                     const T*          fc2_scales,
+                    const WeightType* fc1_expert_weights_stay_on_GPU,
+                    const WeightType* fc2_expert_weights_stay_on_GPU,
                     const int         num_rows,
                     const int         hidden_size,
                     const int         inter_size,
@@ -174,6 +179,7 @@ public:
                     T*                expert_scales,
                     int*              expanded_source_row_to_expanded_dest_row,
                     int*              expert_for_source_row,
+                    int layer_num,
                     cudaStream_t      stream);
 
     void compute_total_rows_before_expert(const int*   sorted_indices,
@@ -233,6 +239,8 @@ public:
                     ActivationType fc1_activation_type,
                     const WeightType* fc2_expert_weights,
                     const float*   fc2_scales,
+                    const WeightType* fc1_expert_weights_stay_on_GPU,
+                    const WeightType* fc2_expert_weights_stay_on_GPU,
                     const int      num_rows,
                     const int      hidden_size,
                     const int      inter_size,
@@ -243,6 +251,7 @@ public:
                     float*         expert_scales,
                     int*           expanded_source_row_to_expanded_dest_row,
                     int*           expert_for_source_row,
+                    int layer_num,
                     cudaStream_t   stream)
     {
         FT_CHECK_WITH_INFO(false, "FP32 x int8 MoE not supported.");
@@ -256,6 +265,8 @@ public:
                     ActivationType fc1_activation_type,
                     const WeightType* fc2_expert_weights,
                     const float*   fc2_scales,
+                    const WeightType* fc1_expert_weights_stay_on_GPU,
+                    const WeightType* fc2_expert_weights_stay_on_GPU,
                     const int      num_rows,
                     const int      hidden_size,
                     const int      inter_size,
@@ -268,6 +279,7 @@ public:
                     float*         expert_scales,
                     int*           expanded_source_row_to_expanded_dest_row,
                     int*           expert_for_source_row,
+                    int layer_num,
                     cudaStream_t   stream)
     {
         FT_CHECK_WITH_INFO(false, "FP32 x int8 MoE not supported.");

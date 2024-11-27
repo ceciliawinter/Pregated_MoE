@@ -275,89 +275,27 @@ class FTT5DecodingWeight(object):
 
         # add top 3 experts per layer
         # layer1 26 56 5
-        t = weight_dict["decoder.block.1.layer.2.mlp.experts.expert_26.wi.weight"].contiguous().cuda()
-        self.w.append(t)
-        t = weight_dict["decoder.block.1.layer.2.mlp.experts.expert_26.wo.weight"].contiguous().cuda()
-        self.w.append(t)
-        t = weight_dict["decoder.block.1.layer.2.mlp.experts.expert_56.wi.weight"].contiguous().cuda()
-        self.w.append(t)
-        t = weight_dict["decoder.block.1.layer.2.mlp.experts.expert_56.wo.weight"].contiguous().cuda()
-        self.w.append(t)
-        t = weight_dict["decoder.block.1.layer.2.mlp.experts.expert_5.wi.weight"].contiguous().cuda()
-        self.w.append(t)
-        t = weight_dict["decoder.block.1.layer.2.mlp.experts.expert_5.wo.weight"].contiguous().cuda()
-        self.w.append(t)
-
         # layer3 17 39 126
-        t = weight_dict["decoder.block.3.layer.2.mlp.experts.expert_17.wi.weight"].contiguous().cuda()
-        self.w.append(t)
-        t = weight_dict["decoder.block.3.layer.2.mlp.experts.expert_17.wo.weight"].contiguous().cuda()
-        self.w.append(t)
-        t = weight_dict["decoder.block.3.layer.2.mlp.experts.expert_39.wi.weight"].contiguous().cuda()
-        self.w.append(t)
-        t = weight_dict["decoder.block.3.layer.2.mlp.experts.expert_39.wo.weight"].contiguous().cuda()
-        self.w.append(t)
-        t = weight_dict["decoder.block.3.layer.2.mlp.experts.expert_126.wi.weight"].contiguous().cuda()
-        self.w.append(t)
-        t = weight_dict["decoder.block.3.layer.2.mlp.experts.expert_126.wo.weight"].contiguous().cuda()
-        self.w.append(t)
-
         # layer5 79 124 0
-        t = weight_dict["decoder.block.5.layer.2.mlp.experts.expert_79.wi.weight"].contiguous().cuda()
-        self.w.append(t)
-        t = weight_dict["decoder.block.5.layer.2.mlp.experts.expert_79.wo.weight"].contiguous().cuda()
-        self.w.append(t)
-        t = weight_dict["decoder.block.5.layer.2.mlp.experts.expert_124.wi.weight"].contiguous().cuda()
-        self.w.append(t)
-        t = weight_dict["decoder.block.5.layer.2.mlp.experts.expert_124.wo.weight"].contiguous().cuda()
-        self.w.append(t)
-        t = weight_dict["decoder.block.5.layer.2.mlp.experts.expert_0.wi.weight"].contiguous().cuda()
-        self.w.append(t)
-        t = weight_dict["decoder.block.5.layer.2.mlp.experts.expert_0.wo.weight"].contiguous().cuda()
-        self.w.append(t)
-
-       # layer7 119 45 7
-        t = weight_dict["decoder.block.7.layer.2.mlp.experts.expert_119.wi.weight"].contiguous().cuda()
-        self.w.append(t)
-        t = weight_dict["decoder.block.7.layer.2.mlp.experts.expert_119.wo.weight"].contiguous().cuda()
-        self.w.append(t)
-        t = weight_dict["decoder.block.7.layer.2.mlp.experts.expert_45.wi.weight"].contiguous().cuda()
-        self.w.append(t)
-        t = weight_dict["decoder.block.7.layer.2.mlp.experts.expert_45.wo.weight"].contiguous().cuda()
-        self.w.append(t)
-        t = weight_dict["decoder.block.7.layer.2.mlp.experts.expert_7.wi.weight"].contiguous().cuda()
-        self.w.append(t)
-        t = weight_dict["decoder.block.7.layer.2.mlp.experts.expert_7.wo.weight"].contiguous().cuda()
-        self.w.append(t)
-
-       # layer9 19 9 38
-        t = weight_dict["decoder.block.9.layer.2.mlp.experts.expert_19.wi.weight"].contiguous().cuda()
-        self.w.append(t)
-        t = weight_dict["decoder.block.9.layer.2.mlp.experts.expert_19.wo.weight"].contiguous().cuda()
-        self.w.append(t)
-        t = weight_dict["decoder.block.9.layer.2.mlp.experts.expert_9.wi.weight"].contiguous().cuda()
-        self.w.append(t)
-        t = weight_dict["decoder.block.9.layer.2.mlp.experts.expert_9.wo.weight"].contiguous().cuda()
-        self.w.append(t)
-        t = weight_dict["decoder.block.9.layer.2.mlp.experts.expert_38.wi.weight"].contiguous().cuda()
-        self.w.append(t)
-        t = weight_dict["decoder.block.9.layer.2.mlp.experts.expert_38.wo.weight"].contiguous().cuda()
-        self.w.append(t)
-
-       # layer11 33 4 2
-        t = weight_dict["decoder.block.11.layer.2.mlp.experts.expert_33.wi.weight"].contiguous().cuda()
-        self.w.append(t)
-        t = weight_dict["decoder.block.11.layer.2.mlp.experts.expert_33.wo.weight"].contiguous().cuda()
-        self.w.append(t)
-        t = weight_dict["decoder.block.11.layer.2.mlp.experts.expert_4.wi.weight"].contiguous().cuda()
-        self.w.append(t)
-        t = weight_dict["decoder.block.11.layer.2.mlp.experts.expert_4.wo.weight"].contiguous().cuda()
-        self.w.append(t)
-        t = weight_dict["decoder.block.11.layer.2.mlp.experts.expert_2.wi.weight"].contiguous().cuda()
-        self.w.append(t)
-        t = weight_dict["decoder.block.11.layer.2.mlp.experts.expert_2.wo.weight"].contiguous().cuda()
-        self.w.append(t)
-
+        # layer7 119 45 7
+        # layer9 19 9 38
+        # layer11 33 4 2
+        top_3_experts_in_128 = [
+            [5, 26, 56],
+            [17, 39, 126],
+            [0, 79, 124],
+            [7, 45, 119],
+            [9, 19, 38],
+            [2, 4, 33]
+        ]
+        # top_k_experts = 3
+        for i, row in enumerate(top_3_experts_in_128):
+            for j, value in enumerate(row):
+                t = weight_dict[f"decoder.block.{i*2+1}.layer.2.mlp.experts.expert_{value}.wi.weight"].contiguous().cuda()
+                self.w.append(t)
+                t = weight_dict[f"decoder.block.{i*2+1}.layer.2.mlp.experts.expert_{value}.wo.weight"].contiguous().cuda()
+                self.w.append(t)
+                
         #TODO: pass None Type to Torch Op
         for i in range(23):
             self.w.append(torch.empty((1,1), dtype=torch_weight_dtype).contiguous().cuda())

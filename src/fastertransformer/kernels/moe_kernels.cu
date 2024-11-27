@@ -741,6 +741,8 @@ void CutlassMoeFCRunner<T, WeightType, Enable>::run_moe_fc(const T*          inp
                                                            ActivationType    fc1_activation_type,   
                                                            const WeightType* fc2_expert_weights,    // [num_experts, inter_size, hidden_size]
                                                            const T*          fc2_scales,
+                                                           const WeightType* fc1_expert_weights_stay_on_GPU,
+                                                           const WeightType* fc2_expert_weights_stay_on_GPU,
                                                            const int         num_rows,              // h_token_num
                                                            const int         hidden_size,
                                                            const int         inter_size,
@@ -753,6 +755,7 @@ void CutlassMoeFCRunner<T, WeightType, Enable>::run_moe_fc(const T*          inp
                                                            T*                expert_scales,
                                                            int*              expanded_source_row_to_expanded_dest_row, // h_token_num, moe_k_
                                                            int*              expert_for_source_row, // h_token_num, moe_k_
+                                                           int layer_num,
                                                            cudaStream_t      stream)
 {
     FT_LOG_DEBUG(__PRETTY_FUNCTION__);
@@ -1027,6 +1030,8 @@ void CutlassMoeFCRunner<T, WeightType, Enable>::run_moe_fc(const T*          inp
                                                            ActivationType    fc1_activation_type,   // 第一个全连接层的激活类型
                                                            const WeightType* fc2_expert_weights,
                                                            const T*          fc2_scales,
+                                                           const WeightType* fc1_expert_weights_stay_on_GPU,
+                                                           const WeightType* fc2_expert_weights_stay_on_GPU,
                                                            const int         num_rows,              // 输入数据的行数
                                                            const int         hidden_size,           // 隐藏层的大小 d_modle
                                                            const int         inter_size,            // 中间层的大小 d_ff
@@ -1037,6 +1042,7 @@ void CutlassMoeFCRunner<T, WeightType, Enable>::run_moe_fc(const T*          inp
                                                            T*                expert_scales,         // 专家缩放因子的指针
                                                            int*              expanded_source_row_to_expanded_dest_row, // 扩展源行到扩展目标行的映射
                                                            int*              expert_for_source_row, // 源行对应的专家
+                                                           int layer_num,
                                                            cudaStream_t      stream)                // CUDA 流，用于异步执行 
 {
     FT_LOG_DEBUG(__PRETTY_FUNCTION__);
@@ -1048,6 +1054,8 @@ void CutlassMoeFCRunner<T, WeightType, Enable>::run_moe_fc(const T*          inp
                fc1_activation_type,
                fc2_expert_weights,
                fc2_scales,
+               fc1_expert_weights_stay_on_GPU,
+               fc2_expert_weights_stay_on_GPU,
                num_rows,
                hidden_size,
                inter_size,
@@ -1060,6 +1068,7 @@ void CutlassMoeFCRunner<T, WeightType, Enable>::run_moe_fc(const T*          inp
                expert_scales,
                expanded_source_row_to_expanded_dest_row,
                expert_for_source_row,
+               layer_num,
                stream);
 }
 

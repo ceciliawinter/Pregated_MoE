@@ -27,6 +27,8 @@ struct FfnWeight {
     DenseWeight<T1, T2> intermediate_weight2;  // for gated activation
     DenseWeight<T1, T2> output_weight;
     DenseWeight<T1, T2> ia3_weight;
+    DenseWeight<T1, T2> intermediate_weight_stay_on_GPU;
+     DenseWeight<T1, T2> output_weight_stay_on_GPU;
     const int8_t* all_weight = nullptr;  // for offload, contain all used weights
 };
 

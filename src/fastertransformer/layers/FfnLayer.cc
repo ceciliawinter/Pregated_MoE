@@ -125,7 +125,7 @@ void FfnLayer<T>::forward(TensorMap* output_tensors, TensorMap* input_tensors, c
         FT_LOG_TRACE("=== milestones 101 === %d", int8_mode_);
         FT_LOG_TRACE("=== milestones 101.5");
 
-        if (int8_mode_ == 0) {
+        if (int8_mode_ == 0) { //select this branch
             if (fetcher_context_.get() != nullptr) {
                 fetcher_context_->allocateBuffer(allocator_, m);
                 fetcher_context_->set_source(
@@ -144,6 +144,8 @@ void FfnLayer<T>::forward(TensorMap* output_tensors, TensorMap* input_tensors, c
                                        activation_type,
                                        ffn_weights->output_weight.kernel,
                                        ffn_weights->output_weight.weight_only_quant_scale,
+                                       ffn_weights->intermediate_weight_stay_on_GPU.kernel,
+                                       ffn_weights->output_weight_stay_on_GPU.kernel,
                                        m,
                                        hidden_units_,
                                        inter_size_,
@@ -180,6 +182,8 @@ void FfnLayer<T>::forward(TensorMap* output_tensors, TensorMap* input_tensors, c
                 activation_type,
                 reinterpret_cast<const quant_t*>(ffn_weights->output_weight.int8_kernel),
                 ffn_weights->output_weight.weight_only_quant_scale,
+                reinterpret_cast<const quant_t*>(ffn_weights->intermediate_weight_stay_on_GPU.kernel),
+                reinterpret_cast<const quant_t*>(ffn_weights->output_weight_stay_on_GPU.kernel),
                 m,
                 hidden_units_,
                 inter_size_,

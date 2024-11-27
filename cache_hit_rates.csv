@@ -1,2 +1,2 @@
 bs,active experts,cache ratio,CPU,RAM (GB),GPU,switch-base-128/Pre-gated/CPU
-256,0,0,Intel(R) Xeon(R) Gold 6330 CPU @ 2.00GHz,1007,NVIDIA H100 PCIe,1.0
+16,0,0,Intel(R) Xeon(R) Gold 6330 CPU @ 2.00GHz,1007,NVIDIA H100 PCIe,1.0
