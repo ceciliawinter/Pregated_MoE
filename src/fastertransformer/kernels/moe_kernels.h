@@ -154,7 +154,7 @@ public:
                     T*                expert_scales,
                     int*              expanded_source_row_to_expanded_dest_row,
                     int*              expert_for_source_row,
-                    int layer_num,
+                    int               layer_num,
                     cudaStream_t      stream);
 
     void run_moe_fc(const T*          input_activations,
@@ -179,7 +179,7 @@ public:
                     T*                expert_scales,
                     int*              expanded_source_row_to_expanded_dest_row,
                     int*              expert_for_source_row,
-                    int layer_num,
+                    int               layer_num,
                     cudaStream_t      stream);
 
     void compute_total_rows_before_expert(const int*   sorted_indices,
@@ -251,7 +251,7 @@ public:
                     float*         expert_scales,
                     int*           expanded_source_row_to_expanded_dest_row,
                     int*           expert_for_source_row,
-                    int layer_num,
+                    int            layer_num,
                     cudaStream_t   stream)
     {
         FT_CHECK_WITH_INFO(false, "FP32 x int8 MoE not supported.");
@@ -279,7 +279,7 @@ public:
                     float*         expert_scales,
                     int*           expanded_source_row_to_expanded_dest_row,
                     int*           expert_for_source_row,
-                    int layer_num,
+                    int            layer_num,
                     cudaStream_t   stream)
     {
         FT_CHECK_WITH_INFO(false, "FP32 x int8 MoE not supported.");

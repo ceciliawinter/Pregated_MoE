@@ -615,7 +615,7 @@ void T5Decoder<T>::forward(std::vector<Tensor>*                         output_t
             ffn_layer_->set_layer("decoder::layer", l, moe_layer_index_);
         }
         FT_LOG_TRACE("==== milestone decoder 943");
-        ffn_layer_->forward(&ffn_output_tensors, &ffn_input_tensors, &layer_weight->ffn_weights);
+        ffn_layer_->forward(&ffn_output_tensors, &ffn_input_tensors, &layer_weight->ffn_weights,l);
         check_cuda_error(cudaStreamSynchronize(stream_));
         FT_LOG_TRACE("==== milestone decoder 202");
 

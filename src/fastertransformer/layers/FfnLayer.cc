@@ -32,7 +32,18 @@ void FfnLayer<T>::forward(std::vector<fastertransformer::Tensor>*       output_t
 {
     TensorMap input_tensor({{"ffn_input", input_tensors->at(0)}});
     TensorMap output_tensor({{"ffn_output", output_tensors->at(0)}});
-    forward(&output_tensor, &input_tensor, ffn_weights);
+    forward(&output_tensor, &input_tensor, ffn_weights, -1);
+}
+
+template<typename T>
+void FfnLayer<T>::forward(std::vector<fastertransformer::Tensor>*       output_tensors,
+                          const std::vector<fastertransformer::Tensor>* input_tensors,
+                          const FfnWeight<T>*                           ffn_weights,
+                          int layer_num)
+{
+    TensorMap input_tensor({{"ffn_input", input_tensors->at(0)}});
+    TensorMap output_tensor({{"ffn_output", output_tensors->at(0)}});
+    forward(&output_tensor, &input_tensor, ffn_weights, layer_num);
 }
 
 template<typename T>
@@ -43,7 +54,12 @@ const char* get_weight_src(const FfnWeight<T>* ffn_weights)
 }
 
 template<typename T>
-void FfnLayer<T>::forward(TensorMap* output_tensors, TensorMap* input_tensors, const FfnWeight<T>* ffn_weights)
+void FfnLayer<T>::forward(TensorMap* output_tensors, TensorMap* input_tensors, const FfnWeight<T>* ffn_weights){
+        forward(output_tensors, input_tensors, ffn_weights, -1);
+}
+
+template<typename T>
+void FfnLayer<T>::forward(TensorMap* output_tensors, TensorMap* input_tensors, const FfnWeight<T>* ffn_weights, int layer_num)
 {
     // input tensors:
     //      ffn_input [token_num, hidden_dimension],
@@ -156,6 +172,7 @@ void FfnLayer<T>::forward(TensorMap* output_tensors, TensorMap* input_tensors, c
                                        expert_scales,
                                        permuted_rows, // h_token_num, moe_k_
                                        permuted_experts, // h_token_num, moe_k_
+                                       layer_num,   // current layer number
                                        stream_);
             FT_LOG_TRACE("=== milestones 102");
         }
@@ -194,6 +211,7 @@ void FfnLayer<T>::forward(TensorMap* output_tensors, TensorMap* input_tensors, c
                 expert_scales,
                 permuted_rows,
                 permuted_experts,
+                layer_num,   // current layer number
                 stream_);
         }
         else {

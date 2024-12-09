@@ -24,22 +24,23 @@
 #include "src/fastertransformer/layers/BaseLayer.h"
 #include "src/fastertransformer/layers/FfnWeight.h"
 #include "src/fastertransformer/utils/activation_types.h"
+#include "src/fastertransformer/utils/config.h"
 #include "src/fastertransformer/utils/cuda_utils.h"
+#include "src/fastertransformer/utils/fetcher.h"
 #include "src/fastertransformer/utils/memory_utils.h"
 #include <stdint.h>
 #include <vector>
-#include "src/fastertransformer/utils/fetcher.h"
-#include "src/fastertransformer/utils/config.h"
 
 namespace fastertransformer {
 
 template<typename T>
 class FfnLayer: public BaseLayer {
 private:
-    // using quant_t = typename std::conditional<std::is_same<T, float>::value, float, typename GlobalConfig::quant_t>::type;
+    // using quant_t = typename std::conditional<std::is_same<T, float>::value, float, typename
+    // GlobalConfig::quant_t>::type;
     using quant_t = typename GlobalConfig::quant_t;
 
-    std::shared_ptr<FetcherContext<T, T>> fetcher_context_ = nullptr;
+    std::shared_ptr<FetcherContext<T, T>>       fetcher_context_      = nullptr;
     std::shared_ptr<FetcherContext<T, quant_t>> int8_fetcher_context_ = nullptr;
 
     // buffer handling
@@ -134,17 +135,24 @@ public:
 
     virtual void forward(std::vector<fastertransformer::Tensor>*       output_tensors,
                          const std::vector<fastertransformer::Tensor>* input_tensors,
+                         const FfnWeight<T>*                           ffn_weights,
+                         int                                           layer_num);
+    virtual void forward(std::vector<fastertransformer::Tensor>*       output_tensors,
+                         const std::vector<fastertransformer::Tensor>* input_tensors,
                          const FfnWeight<T>*                           ffn_weights);
-    virtual void forward(TensorMap* output_tensors, TensorMap* input_tensors, const FfnWeight<T>* ffn_weights);
+    virtual void
+    forward(TensorMap* output_tensors, TensorMap* input_tensors, const FfnWeight<T>* ffn_weights, int layer_num);
+    virtual void
+    forward(TensorMap* output_tensors, TensorMap* input_tensors, const FfnWeight<T>* ffn_weights);
 
     // called in T5Decoder and TODO: T5Encoder
     virtual void reset_fetcher();
     virtual void initFetcherContext(FetchType mode, int moe_k, size_t arena_size);
-    virtual void set_layer(const std::string &layer_name, int layer_index, const std::vector<int64_t>& moe_layer_index);
+    virtual void set_layer(const std::string& layer_name, int layer_index, const std::vector<int64_t>& moe_layer_index);
 
-    const FfnWeight<T> *ffn_weights_of_the_next_moe_layer_ = nullptr;   // for prefetch
-                                                                        // TODO: need to be assigned in T5Encoder and T5Decoder
-
+    const FfnWeight<T>* ffn_weights_of_the_next_moe_layer_ =
+        nullptr;  // for prefetch
+                  // TODO: need to be assigned in T5Encoder and T5Decoder
 };
 
 template<typename T>

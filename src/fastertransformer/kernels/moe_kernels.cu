@@ -755,7 +755,7 @@ void CutlassMoeFCRunner<T, WeightType, Enable>::run_moe_fc(const T*          inp
                                                            T*                expert_scales,
                                                            int*              expanded_source_row_to_expanded_dest_row, // h_token_num, moe_k_
                                                            int*              expert_for_source_row, // h_token_num, moe_k_
-                                                           int layer_num,
+                                                           int               layer_num,
                                                            cudaStream_t      stream)
 {
     FT_LOG_DEBUG(__PRETTY_FUNCTION__);
@@ -813,31 +813,33 @@ void CutlassMoeFCRunner<T, WeightType, Enable>::run_moe_fc(const T*          inp
                 permuted_rows_,    // [k * num_rows] output
                 k * num_rows,
                 stream);
+    //------------------print experts-------------------------------
     // cudaDeviceSynchronize();
-    std::cout <<"****expert_for_source_row ";
-    int*  h_data= new int[num_rows * k];
-    cudaMemcpy(h_data, expert_for_source_row, num_rows * k * sizeof(int), cudaMemcpyDeviceToHost);
-    for(int i = 0; i < num_rows * k; i++) {
+    // std::cout <<"****expert_for_source_row ";
+    // int*  h_data= new int[num_rows * k];
+    // cudaMemcpy(h_data, expert_for_source_row, num_rows * k * sizeof(int), cudaMemcpyDeviceToHost);
+    // for(int i = 0; i < num_rows * k; i++) {
 
-        std::cout << h_data[i] << " ";
-    }
-    std::cout << std::endl << "permuted_experts_ ";
-    cudaMemcpy(h_data, permuted_experts_, num_rows * k * sizeof(int), cudaMemcpyDeviceToHost);
-    for(int i = 0; i < num_rows * k; i++) {
-        std::cout << h_data[i] << " ";
-    }
-    std::cout << std::endl << "source_rows_ ";
-    cudaMemcpy(h_data, source_rows_, num_rows * k * sizeof(int), cudaMemcpyDeviceToHost);
-    for(int i = 0; i < num_rows * k; i++) {
-        std::cout << h_data[i] << " ";
-    }
-    std::cout << std::endl << "permuted_rows_ ";
-    cudaMemcpy(h_data, permuted_rows_, num_rows * k * sizeof(int), cudaMemcpyDeviceToHost);
-    for(int i = 0; i < num_rows * k; i++) {
-        std::cout << h_data[i] << " ";
-    }
-    std::cout << std::endl ;
-    delete[] h_data;
+    //     std::cout << h_data[i] << " ";
+    // }
+    // std::cout << std::endl << "permuted_experts_ ";
+    // cudaMemcpy(h_data, permuted_experts_, num_rows * k * sizeof(int), cudaMemcpyDeviceToHost);
+    // for(int i = 0; i < num_rows * k; i++) {
+    //     std::cout << h_data[i] << " ";
+    // }
+    // std::cout << std::endl << "source_rows_ ";
+    // cudaMemcpy(h_data, source_rows_, num_rows * k * sizeof(int), cudaMemcpyDeviceToHost);
+    // for(int i = 0; i < num_rows * k; i++) {
+    //     std::cout << h_data[i] << " ";
+    // }
+    // std::cout << std::endl << "permuted_rows_ ";
+    //----------------------------------------------------------------
+    // cudaMemcpy(h_data, permuted_rows_, num_rows * k * sizeof(int), cudaMemcpyDeviceToHost);
+    // for(int i = 0; i < num_rows * k; i++) {
+    //     std::cout << h_data[i] << " ";
+    // }
+    // std::cout << std::endl ;
+    // delete[] h_data;
     // printf("\n);
     // for(int i = 0; i < num_rows * k; i++) {
     //     printf("[%d] = %f,", i, reinterpret_cast<float*>(permuted_experts_)[i]);
@@ -901,7 +903,7 @@ void CutlassMoeFCRunner<T, WeightType, Enable>::run_moe_fc(const T*          inp
         if (fetcher_context_->mode == FetchType::PREFETCH) {
             if (fetcher_context_->first_time) {
                 FT_LOG_DEBUG("Start fetch layer 1");
-                fetcher_context_->fetch(permuted_experts_, false); //获取专家权重，将专家索引复制到CPU上，并且在GPU内分配内存
+                fetcher_context_->fetch(permuted_experts_, false, fc1_expert_weights_stay_on_GPU, fc2_expert_weights_stay_on_GPU, layer_num); //获取专家权重，将专家索引复制到CPU上，并且在GPU内分配内存
                 fetcher_context_->sync();
                 FT_LOG_DEBUG("Fetch layer 1 end");
             }
@@ -916,10 +918,10 @@ void CutlassMoeFCRunner<T, WeightType, Enable>::run_moe_fc(const T*          inp
                                           fc1_scales,
                                           fc2_scales);
             // Prefetch next layer
-            fetcher_context_->fetch(permuted_experts_, true);
+            fetcher_context_->fetch(permuted_experts_, true, fc1_expert_weights_stay_on_GPU, fc2_expert_weights_stay_on_GPU, layer_num);
         }
         else if (fetcher_context_->mode == FetchType::FETCH_ON_DEMAND){
-            fetcher_context_->fetch(permuted_experts_, false);
+            fetcher_context_->fetch(permuted_experts_, false, fc1_expert_weights_stay_on_GPU, fc2_expert_weights_stay_on_GPU, layer_num);
             fetcher_context_->sync();
             fetcher_context_->get_weights(num_experts,
                                           fc1_expert_weights,
@@ -970,8 +972,9 @@ void CutlassMoeFCRunner<T, WeightType, Enable>::run_moe_fc(const T*          inp
     check_cuda_error(cudaGetLastError());
 #endif
 
-    std::cout << "T Type: " << typeid(T).name() << std::endl;
-    std::cout << "WeightType Type: " << typeid(WeightType).name() << std::endl;
+    // std::cout << "T Type: " << typeid(T).name() << std::endl;
+    // std::cout << "WeightType Type: " << typeid(WeightType).name() << std::endl;
+    
     // half temp_half = 0.0;
     // std::cout << "temp_half Type: " << typeid(temp_half).name() << std::endl;
     // float temp_float= 0.0;
@@ -1042,7 +1045,7 @@ void CutlassMoeFCRunner<T, WeightType, Enable>::run_moe_fc(const T*          inp
                                                            T*                expert_scales,         // 专家缩放因子的指针
                                                            int*              expanded_source_row_to_expanded_dest_row, // 扩展源行到扩展目标行的映射
                                                            int*              expert_for_source_row, // 源行对应的专家
-                                                           int layer_num,
+                                                           int               layer_num,
                                                            cudaStream_t      stream)                // CUDA 流，用于异步执行 
 {
     FT_LOG_DEBUG(__PRETTY_FUNCTION__);
@@ -1173,19 +1176,21 @@ void initialize_moe_routing_kernelLauncher(const T*     unpermuted_input,
                                                                      num_rows,
                                                                      k * active_rows,
                                                                      cols);
-    int*  h_data_2 = new int[num_rows * k];
-    std::cout <<"****expanded_dest_row_to_expanded_source_row ";
-    cudaMemcpy(h_data_2, expanded_dest_row_to_expanded_source_row, num_rows * k * sizeof(int), cudaMemcpyDeviceToHost);
-    for(int i = 0; i < num_rows * k; i++) {
-        std::cout << h_data_2[i] << " ";
-    }
-    std::cout <<std::endl<<"****expanded_source_row_to_expanded_dest_row ";
-    cudaMemcpy(h_data_2, expanded_source_row_to_expanded_dest_row, num_rows * k * sizeof(int), cudaMemcpyDeviceToHost);
-    for(int i = 0; i < num_rows * k; i++) {
-        std::cout << h_data_2[i] << " ";
-    }
-    std::cout << std::endl;
-    delete[] h_data_2;
+    //-------------------------print experts--------------------------------
+    // int*  h_data_2 = new int[num_rows * k];
+    // std::cout <<"****expanded_dest_row_to_expanded_source_row ";
+    // cudaMemcpy(h_data_2, expanded_dest_row_to_expanded_source_row, num_rows * k * sizeof(int), cudaMemcpyDeviceToHost);
+    // for(int i = 0; i < num_rows * k; i++) {
+    //     std::cout << h_data_2[i] << " ";
+    // }
+    // std::cout <<std::endl<<"****expanded_source_row_to_expanded_dest_row ";
+    // cudaMemcpy(h_data_2, expanded_source_row_to_expanded_dest_row, num_rows * k * sizeof(int), cudaMemcpyDeviceToHost);
+    // for(int i = 0; i < num_rows * k; i++) {
+    //     std::cout << h_data_2[i] << " ";
+    // }
+    // std::cout << std::endl;
+    // delete[] h_data_2;
+    //-----------------------------------------------------------------------
     // 打印规约后的专家编号
     // printf("After reduction:\n");
     // printf("expanded_source_row_to_expanded_dest_row=%p\n", expanded_source_row_to_expanded_dest_row);

@@ -177,7 +177,7 @@ FTT5Decoding<T>::FTT5Decoding(int64_t                        head_num,
                             create_tensor_from_bin<int8_t>(
                                 {top_k_experts, output_w_size}, wo_filenames, true));
                         ptr = get_ptr<int8_t>(_weights[_weights.size() - 1]);
-                        decoder_layer_weights->ffn_weights.intermediate_weight_stay_on_GPU.kernel = reinterpret_cast<const T*>(ptr);
+                        decoder_layer_weights->ffn_weights.output_weight_stay_on_GPU.kernel = reinterpret_cast<const T*>(ptr);
                         return;
                     }
                 }
