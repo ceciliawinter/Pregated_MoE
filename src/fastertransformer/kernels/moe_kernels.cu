@@ -755,7 +755,7 @@ void CutlassMoeFCRunner<T, WeightType, Enable>::run_moe_fc(const T*          inp
                                                            T*                expert_scales,
                                                            int*              expanded_source_row_to_expanded_dest_row, // h_token_num, moe_k_
                                                            int*              expert_for_source_row, // h_token_num, moe_k_
-                                                           int layer_num,
+                                                        //    int layer_num,
                                                            cudaStream_t      stream)
 {
     FT_LOG_DEBUG(__PRETTY_FUNCTION__);
@@ -1042,7 +1042,7 @@ void CutlassMoeFCRunner<T, WeightType, Enable>::run_moe_fc(const T*          inp
                                                            T*                expert_scales,         // 专家缩放因子的指针
                                                            int*              expanded_source_row_to_expanded_dest_row, // 扩展源行到扩展目标行的映射
                                                            int*              expert_for_source_row, // 源行对应的专家
-                                                           int layer_num,
+                                                        //    int layer_num,
                                                            cudaStream_t      stream)                // CUDA 流，用于异步执行 
 {
     FT_LOG_DEBUG(__PRETTY_FUNCTION__);
@@ -1068,7 +1068,7 @@ void CutlassMoeFCRunner<T, WeightType, Enable>::run_moe_fc(const T*          inp
                expert_scales,
                expanded_source_row_to_expanded_dest_row,
                expert_for_source_row,
-               layer_num,
+            //    layer_num,
                stream);
 }
 
