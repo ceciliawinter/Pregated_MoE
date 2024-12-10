@@ -802,7 +802,7 @@ void MoeGemmRunner<T, WeightType>::run_gemm<EpilogueTag>(const T*          A,
                                       candidate_configs[ii],
                                       stream,
                                       &occupancies[ii]);
-        std::cout<<"test stage "<< ii << std::endl;
+        // std::cout<<"test stage "<< ii << std::endl;
     }
 
     static constexpr int workspace_bytes = 0;  // No workspace for MoE GEMMs.
@@ -818,7 +818,7 @@ void MoeGemmRunner<T, WeightType>::run_gemm<EpilogueTag>(const T*          A,
                                                                             multi_processor_count_,
                                                                             is_weight_only);
     // 用于实际执行
-    std::cout<<"run stage "<< chosen_config.stages << std::endl;
+    // std::cout<<"run stage "<< chosen_config.stages << std::endl;
     dispatch_to_arch<EpilogueTag>(A,
                                   B,
                                   weight_scales,
