@@ -814,42 +814,31 @@ void CutlassMoeFCRunner<T, WeightType, Enable>::run_moe_fc(const T*          inp
                 k * num_rows,
                 stream);
     // cudaDeviceSynchronize();
-    std::cout <<"****expert_for_source_row ";
-    int*  h_data= new int[num_rows * k];
-    cudaMemcpy(h_data, expert_for_source_row, num_rows * k * sizeof(int), cudaMemcpyDeviceToHost);
-    for(int i = 0; i < num_rows * k; i++) {
+    // std::cout <<"****expert_for_source_row ";
+    // int*  h_data= new int[num_rows * k];
+    // cudaMemcpy(h_data, expert_for_source_row, num_rows * k * sizeof(int), cudaMemcpyDeviceToHost);
+    // for(int i = 0; i < num_rows * k; i++) {
 
-        std::cout << h_data[i] << " ";
-    }
-    std::cout << std::endl << "permuted_experts_ ";
-    cudaMemcpy(h_data, permuted_experts_, num_rows * k * sizeof(int), cudaMemcpyDeviceToHost);
-    for(int i = 0; i < num_rows * k; i++) {
-        std::cout << h_data[i] << " ";
-    }
-    std::cout << std::endl << "source_rows_ ";
-    cudaMemcpy(h_data, source_rows_, num_rows * k * sizeof(int), cudaMemcpyDeviceToHost);
-    for(int i = 0; i < num_rows * k; i++) {
-        std::cout << h_data[i] << " ";
-    }
-    std::cout << std::endl << "permuted_rows_ ";
-    cudaMemcpy(h_data, permuted_rows_, num_rows * k * sizeof(int), cudaMemcpyDeviceToHost);
-    for(int i = 0; i < num_rows * k; i++) {
-        std::cout << h_data[i] << " ";
-    }
-    std::cout << std::endl ;
-    delete[] h_data;
-    // printf("\n);
-    // for(int i = 0; i < num_rows * k; i++) {
-    //     printf("[%d] = %f,", i, reinterpret_cast<float*>(permuted_experts_)[i]);
+    //     std::cout << h_data[i] << " ";
     // }
-    // // printf("\nsource_rows_");
+    // std::cout << std::endl << "permuted_experts_ ";
+    // cudaMemcpy(h_data, permuted_experts_, num_rows * k * sizeof(int), cudaMemcpyDeviceToHost);
     // for(int i = 0; i < num_rows * k; i++) {
-    //     printf("[%d] = %d,", i, reinterpret_cast<int>(source_rows_[i]));
+    //     std::cout << h_data[i] << " ";
     // }
-    // printf("\npermuted_rows_");
+    // std::cout << std::endl << "source_rows_ ";
+    // cudaMemcpy(h_data, source_rows_, num_rows * k * sizeof(int), cudaMemcpyDeviceToHost);
     // for(int i = 0; i < num_rows * k; i++) {
-    //     printf("[%d] = %d,", i, reinterpret_cast<int>(permuted_rows_[i]));
+    //     std::cout << h_data[i] << " ";
     // }
+    // std::cout << std::endl << "permuted_rows_ ";
+    // cudaMemcpy(h_data, permuted_rows_, num_rows * k * sizeof(int), cudaMemcpyDeviceToHost);
+    // for(int i = 0; i < num_rows * k; i++) {
+    //     std::cout << h_data[i] << " ";
+    // }
+    // std::cout << std::endl ;
+    // delete[] h_data;
+
 
 #ifndef NDEBUG
     cudaDeviceSynchronize();
@@ -879,7 +868,7 @@ void CutlassMoeFCRunner<T, WeightType, Enable>::run_moe_fc(const T*          inp
     compute_total_rows_before_expert(
         permuted_experts_, expanded_active_expert_rows, num_experts, total_rows_before_expert_, stream);
 
-    std::cout <<"compute_total_rows_before_expert ";
+    // std::cout <<"compute_total_rows_before_expert ";
 
     // int h_size = num_experts;
     // int* h_data_rows_before_expert= new int[h_size];
@@ -970,8 +959,8 @@ void CutlassMoeFCRunner<T, WeightType, Enable>::run_moe_fc(const T*          inp
     check_cuda_error(cudaGetLastError());
 #endif
 
-    std::cout << "T Type: " << typeid(T).name() << std::endl;
-    std::cout << "WeightType Type: " << typeid(WeightType).name() << std::endl;
+    // std::cout << "T Type: " << typeid(T).name() << std::endl;
+    // std::cout << "WeightType Type: " << typeid(WeightType).name() << std::endl;
     // half temp_half = 0.0;
     // std::cout << "temp_half Type: " << typeid(temp_half).name() << std::endl;
     // float temp_float= 0.0;
@@ -1173,27 +1162,20 @@ void initialize_moe_routing_kernelLauncher(const T*     unpermuted_input,
                                                                      num_rows,
                                                                      k * active_rows,
                                                                      cols);
-    int*  h_data_2 = new int[num_rows * k];
-    std::cout <<"****expanded_dest_row_to_expanded_source_row ";
-    cudaMemcpy(h_data_2, expanded_dest_row_to_expanded_source_row, num_rows * k * sizeof(int), cudaMemcpyDeviceToHost);
-    for(int i = 0; i < num_rows * k; i++) {
-        std::cout << h_data_2[i] << " ";
-    }
-    std::cout <<std::endl<<"****expanded_source_row_to_expanded_dest_row ";
-    cudaMemcpy(h_data_2, expanded_source_row_to_expanded_dest_row, num_rows * k * sizeof(int), cudaMemcpyDeviceToHost);
-    for(int i = 0; i < num_rows * k; i++) {
-        std::cout << h_data_2[i] << " ";
-    }
-    std::cout << std::endl;
-    delete[] h_data_2;
-    // 打印规约后的专家编号
-    // printf("After reduction:\n");
-    // printf("expanded_source_row_to_expanded_dest_row=%p\n", expanded_source_row_to_expanded_dest_row);
-    // printf("size=%lu", sizeof(expanded_source_row_to_expanded_dest_row)/sizeof(int));
-    // for (int i = 0; i < num_rows; ++i) {
-    //     printf("Expert %d ", expanded_source_row_to_expanded_dest_row[i]);
+    // int*  h_data_2 = new int[num_rows * k];
+    // std::cout <<"****expanded_dest_row_to_expanded_source_row ";
+    // cudaMemcpy(h_data_2, expanded_dest_row_to_expanded_source_row, num_rows * k * sizeof(int), cudaMemcpyDeviceToHost);
+    // for(int i = 0; i < num_rows * k; i++) {
+    //     std::cout << h_data_2[i] << " ";
     // }
-    // printf("\n");
+    // std::cout <<std::endl<<"****expanded_source_row_to_expanded_dest_row ";
+    // cudaMemcpy(h_data_2, expanded_source_row_to_expanded_dest_row, num_rows * k * sizeof(int), cudaMemcpyDeviceToHost);
+    // for(int i = 0; i < num_rows * k; i++) {
+    //     std::cout << h_data_2[i] << " ";
+    // }
+    // std::cout << std::endl;
+    // delete[] h_data_2;
+
 }
 
 // Final kernel to unpermute and scale

@@ -83,7 +83,7 @@ void FetcherContext<ActT, WeightT, BiasT>::fetch(const int* permuted_experts, bo
 
     auto new_end = std::unique(permuted_experts_, permuted_experts_ + num_rows_);
     num_active_experts_ = new_end - permuted_experts_;
-    std::cout << "num_active_experts_="<<num_active_experts_<<std::endl;
+    // std::cout << "num_active_experts_="<<num_active_experts_<<std::endl;
 
     if (GlobalConfig::instance().profiling) {
         Profiling::instance().activeExperts(num_active_experts_);

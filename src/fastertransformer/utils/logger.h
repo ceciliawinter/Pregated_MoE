@@ -46,7 +46,7 @@ public:
     template<typename... Args>
     void log(const Level level, const std::string format, const Args&... args)
     {
-        if (level_ <= level || level == fastertransformer::Logger::TRACE) {
+        if (level_ <= level) {
             std::string fmt    = getPrefix(level) + format + "\n";
             FILE*       out    = level_ < WARNING ? stdout : stderr;
             std::string logstr = fmtstr(fmt, args...);
@@ -57,7 +57,7 @@ public:
     template<typename... Args>
     void log(const Level level, const int rank, const std::string format, const Args&... args)
     {
-        if (level_ <= level || level == fastertransformer::Logger::TRACE) {
+        if (level_ <= level ) { //|| level == fastertransformer::Logger::TRACE
             std::string fmt    = getPrefix(level, rank) + format + "\n";
             FILE*       out    = level_ < WARNING ? stdout : stderr;
             std::string logstr = fmtstr(fmt, args...);
@@ -108,7 +108,7 @@ private:
 
 #define FT_LOG(level, ...)                                                                                             \
     do {                                                                                                               \
-        if (fastertransformer::Logger::getLogger().getLevel() <= level || level == fastertransformer::Logger::TRACE) { \
+        if (fastertransformer::Logger::getLogger().getLevel() <= level) { \
             fastertransformer::Logger::getLogger().log(level, __VA_ARGS__);                                            \
         }                                                                                                              \
     } while (0)

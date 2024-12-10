@@ -161,23 +161,23 @@ FTT5Decoding<T>::FTT5Decoding(int64_t                        head_num,
                         decoder_layer_weights->ffn_weights.all_weight = get_ptr<int8_t>(_weights[_weights.size() - 1]);
                         
                         // for Top 3 experts on GPU
-                        std::vector<std::string> wi_filenames, wo_filenames;
-                        for (int e = 0; e < top_k_experts; e++) {
-                            wi_filenames.push_back(
-                                offload_path + "decoder.block." + std::to_string(i) + ".layer.2.mlp.experts.expert_" + std::to_string(h_top_3_experts_in_128[i/2][e]) + ".wi.weight.0.bin");
-                            wo_filenames.push_back(
-                                offload_path + "decoder.block." + std::to_string(i) + ".layer.2.mlp.experts.expert_" + std::to_string(h_top_3_experts_in_128[i/2][e]) + ".wo.weight.0.bin");
-                        }
-                        _weights.push_back(
-                            create_tensor_from_bin<int8_t>(
-                                {top_k_experts, intermediate_w_size}, wi_filenames, true));
-                        auto ptr = get_ptr<int8_t>(_weights[_weights.size() - 1]);
-                        decoder_layer_weights->ffn_weights.intermediate_weight_stay_on_GPU.kernel = reinterpret_cast<const T*>(ptr);
-                        _weights.push_back(
-                            create_tensor_from_bin<int8_t>(
-                                {top_k_experts, output_w_size}, wo_filenames, true));
-                        ptr = get_ptr<int8_t>(_weights[_weights.size() - 1]);
-                        decoder_layer_weights->ffn_weights.intermediate_weight_stay_on_GPU.kernel = reinterpret_cast<const T*>(ptr);
+                        // std::vector<std::string> wi_filenames, wo_filenames;
+                        // for (int e = 0; e < top_k_experts; e++) {
+                        //     wi_filenames.push_back(
+                        //         offload_path + "decoder.block." + std::to_string(i) + ".layer.2.mlp.experts.expert_" + std::to_string(h_top_3_experts_in_128[i/2][e]) + ".wi.weight.0.bin");
+                        //     wo_filenames.push_back(
+                        //         offload_path + "decoder.block." + std::to_string(i) + ".layer.2.mlp.experts.expert_" + std::to_string(h_top_3_experts_in_128[i/2][e]) + ".wo.weight.0.bin");
+                        // }
+                        // _weights.push_back(
+                        //     create_tensor_from_bin<int8_t>(
+                        //         {top_k_experts, intermediate_w_size}, wi_filenames, true));
+                        // auto ptr = get_ptr<int8_t>(_weights[_weights.size() - 1]);
+                        // decoder_layer_weights->ffn_weights.intermediate_weight_stay_on_GPU.kernel = reinterpret_cast<const T*>(ptr);
+                        // _weights.push_back(
+                        //     create_tensor_from_bin<int8_t>(
+                        //         {top_k_experts, output_w_size}, wo_filenames, true));
+                        // ptr = get_ptr<int8_t>(_weights[_weights.size() - 1]);
+                        // decoder_layer_weights->ffn_weights.output_weight_stay_on_GPU.kernel = reinterpret_cast<const T*>(ptr);
                         return;
                     }
                 }

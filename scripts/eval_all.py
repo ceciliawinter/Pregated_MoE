@@ -117,11 +117,13 @@ def profile_config(cpp_config, model, method, batch_size, forced_num_expert=0, c
     )
 
     print(command)
-
+    # print("before command")
     result = subprocess.run(
         command,
         shell=True,
         capture_output=True,
+        # stdout=None,               # 子进程的标准输出直接打印到主进程的终端
+        # stderr=None,               # 子进程的标准错误直接打印到主进程的终端
         text=True,
         cwd="/workspace/FasterTransformer/build"
     )
@@ -178,9 +180,9 @@ def main():
         # "switch-large-128",
     ]
     batch_sizes = [
-        1,
+        # 1,
         # 2,
-        # 4,
+        4,
         # 8,
         # 16,
         # 32,
@@ -310,8 +312,8 @@ def main():
         ]
         for model, method, batch_size in rerun_configs:
             row_idx = batch_sizes.index(batch_size)
-            # col_idx = "{}/{}".format(model, method)
-            col_idx = f'{model}/{method}'
+            col_idx = "{}/{}".format(model, method)
+            # col_idx = f'{model}/{method}'
             record = profile_config(cpp_config, model, method, batch_size)
             for metric, df in dfs.items():
                 df.loc[row_idx, col_idx] = record[metric]

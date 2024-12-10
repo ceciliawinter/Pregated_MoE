@@ -25,7 +25,7 @@ namespace fastertransformer {
 template<typename T>
 void T5Encoder<T>::initialize()
 {
-    printf("attention_type_ = %d, ActivationType = %d, has_adapters = %d\n", attention_type_, activation_type_, has_adapters()); 
+    // printf("attention_type_ = %d, ActivationType = %d, has_adapters = %d\n", attention_type_, activation_type_, has_adapters()); 
     // attention_type_ = 1, UNFUSED_PADDED_MHA
     // ActivationType = 1 Relu
     // has_adapters = 0
@@ -557,7 +557,7 @@ void T5Encoder<T>::forward(TensorMap*                output_tensors,
     }
     const size_t local_batch_size = getLocalBatchSize(request_batch_size, request_seq_len, pipeline_para_.world_size_);
     const size_t iteration_num    = request_batch_size / local_batch_size;
-    printf("iteration_num = %d, request_batch_size = %d, local_batch_size = %d", iteration_num, request_batch_size, local_batch_size);
+    // printf("iteration_num = %d, request_batch_size = %d, local_batch_size = %d", iteration_num, request_batch_size, local_batch_size);
     FT_LOG_TRACE("=== milestone 1");
     // NOTE: p/prompt-tuning process here (lookup prompt embedding tables by task name ids)
     // get p/prompt-tuning weight for each batch --> shape [batch]
@@ -1042,7 +1042,7 @@ void T5Encoder<T>::forward(TensorMap*                output_tensors,
                            stream_);
             }
         }
-        printf("pipeline_para_.rank_ = %d, pipeline_para_.world_size_=%d\n", pipeline_para_.rank_, pipeline_para_.world_size_); // 0, 1
+        // printf("pipeline_para_.rank_ = %d, pipeline_para_.world_size_=%d\n", pipeline_para_.rank_, pipeline_para_.world_size_); // 0, 1
         if (pipeline_para_.rank_ == pipeline_para_.world_size_ - 1) {
             if (layernorm_type_ == LayerNormType::pre_layernorm) {
                 invokeGeneralT5LayerNorm(t5_encoder_output_ptr,

@@ -149,9 +149,9 @@ def translate(args_dict):
     print("========================================")
 
     lib_path = args_dict['lib_path']
-
+    # print(model_path)
     t5_model = T5ForConditionalGeneration.from_pretrained(model_path)
-    
+    # print("finish loading model")
     if dist.is_mpi_available():
         try:
             dist.init_process_group(backend='mpi')
