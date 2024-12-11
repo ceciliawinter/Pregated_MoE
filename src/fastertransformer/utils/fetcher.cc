@@ -81,7 +81,7 @@ void FetcherContext<ActT, WeightT, BiasT>::fetch(const int*      permuted_expert
 
     auto new_end        = std::unique(permuted_experts_, permuted_experts_ + num_rows_);
     num_active_experts_ = new_end - permuted_experts_;
-    std::cout << "num_active_experts_=" << num_active_experts_ << std::endl;
+    // std::cout << "num_active_experts_=" << num_active_experts_ << std::endl;
 
     if (GlobalConfig::instance().profiling) {
         Profiling::instance().activeExperts(num_active_experts_);
@@ -121,7 +121,7 @@ void FetcherContext<ActT, WeightT, BiasT>::fetch(const int*      permuted_expert
                 break;
             }
         }
-        std::cout << "found value " << found <<std::endl;
+        // std::cout << "found value " << found <<std::endl;
         if (scales_required) {
             futures_.push_back(GroupedMemoryArena::instance().allocate(
                 layer_name + "expert" + std::to_string(expert),
