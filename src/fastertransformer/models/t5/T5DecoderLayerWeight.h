@@ -82,7 +82,7 @@ private:
 
     int real_weights_num_;
 
-    const static int weights_num_ = 24;
+    const static int weights_num_ = 26;
     T*               weights_ptr[weights_num_];
     size_t           weights_size[weights_num_];
 

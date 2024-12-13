@@ -46,7 +46,7 @@ T5DecoderLayerWeight<T>::T5DecoderLayerWeight(const size_t head_num,
     use_gated_activation_(use_gated_activation),
     ia3_num_tasks_(ia3_num_tasks)
 {
-    real_weights_num_ = (11 + (use_gated_activation ? 1 : 0)) * (t5_with_bias ? 2 : 1);
+    real_weights_num_ = (11 + (use_gated_activation ? 1 : 0)) * (t5_with_bias ? 2 : 1) + 2; // add two for stay on GPU
 
     FT_LOG_DEBUG("T5DecoderLayerWeight " + std::string(__func__) + " start");
 
@@ -80,7 +80,17 @@ void T5DecoderLayerWeight<T>::initialize()
         weights_size[9]  = d_model_ * (inter_size_ / tensor_para_size_);
         weights_size[10] = (inter_size_ / tensor_para_size_) * d_model_;
     }
-
+    // add two for stay on GPU
+    if(!t5_with_bias_){
+        if (use_gated_activation_) {
+            weights_size[12] = d_model_ * (inter_size_ / tensor_para_size_);
+            weights_size[13] = (inter_size_ / tensor_para_size_) * d_model_;
+        }
+        else{
+            weights_size[11] = d_model_ * (inter_size_ / tensor_para_size_);
+            weights_size[12] = (inter_size_ / tensor_para_size_) * d_model_;
+        }
+    }
     if (t5_with_bias_) {
         if (use_gated_activation_) {
             weights_size[12] = d_model_;
@@ -95,6 +105,8 @@ void T5DecoderLayerWeight<T>::initialize()
             weights_size[21] = (inter_size_ / tensor_para_size_);
             weights_size[22] = (inter_size_ / tensor_para_size_);  // for gated activation
             weights_size[23] = d_model_;
+            weights_size[24] = d_model_ * (inter_size_ / tensor_para_size_);
+            weights_size[25] = (inter_size_ / tensor_para_size_) * d_model_;
         }
         else {
             weights_size[11] = d_model_;
@@ -108,6 +120,8 @@ void T5DecoderLayerWeight<T>::initialize()
             weights_size[19] = d_model_;
             weights_size[20] = (inter_size_ / tensor_para_size_);
             weights_size[21] = d_model_;
+            weights_size[22] = d_model_ * (inter_size_ / tensor_para_size_);
+            weights_size[23] = (inter_size_ / tensor_para_size_) * d_model_;
         }
     }
 
@@ -168,6 +182,9 @@ T5DecoderLayerWeight<T>::~T5DecoderLayerWeight()
         ffn_weights.intermediate_weight2.bias = nullptr;
         ffn_weights.output_weight.bias        = nullptr;
         is_maintain_buffer                    = false;
+
+        ffn_weights.intermediate_weight_stay_on_GPU.kernel  = nullptr;
+        ffn_weights.output_weight_stay_on_GPU.kernel  = nullptr;
     }
 
     if (maintain_ia3_buffer_) {
@@ -286,6 +303,8 @@ void T5DecoderLayerWeight<T>::setWeightPtr()
             ffn_weights.intermediate_weight.bias  = weights_ptr[21];
             ffn_weights.intermediate_weight2.bias = weights_ptr[22];
             ffn_weights.output_weight.bias        = weights_ptr[23];
+            ffn_weights.intermediate_weight_stay_on_GPU.kernel = weights_ptr[24];
+            ffn_weights.output_weight_stay_on_GPU.kernel = weights_ptr[25];
         }
         else {
             pre_layernorm_weights.beta                          = weights_ptr[11];
@@ -301,6 +320,19 @@ void T5DecoderLayerWeight<T>::setWeightPtr()
 
             ffn_weights.intermediate_weight.bias = weights_ptr[20];
             ffn_weights.output_weight.bias       = weights_ptr[21];
+
+            ffn_weights.intermediate_weight_stay_on_GPU.kernel = weights_ptr[22];
+            ffn_weights.output_weight_stay_on_GPU.kernel = weights_ptr[23];
+        }
+    }
+    else{
+        if(use_gated_activation_){
+            ffn_weights.intermediate_weight_stay_on_GPU.kernel = weights_ptr[12];
+            ffn_weights.output_weight_stay_on_GPU.kernel = weights_ptr[13];
+        }
+        else{
+            ffn_weights.intermediate_weight_stay_on_GPU.kernel = weights_ptr[11];
+            ffn_weights.output_weight_stay_on_GPU.kernel = weights_ptr[12];
         }
     }
 

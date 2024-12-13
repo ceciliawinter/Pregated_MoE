@@ -881,7 +881,7 @@ void CutlassMoeFCRunner<T, WeightType, Enable>::run_moe_fc(const T*          inp
     compute_total_rows_before_expert(
         permuted_experts_, expanded_active_expert_rows, num_experts, total_rows_before_expert_, stream);
 
-    std::cout <<"compute_total_rows_before_expert ";
+    // std::cout <<"compute_total_rows_before_expert ";
 
     // int h_size = num_experts;
     // int* h_data_rows_before_expert= new int[h_size];

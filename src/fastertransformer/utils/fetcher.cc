@@ -82,7 +82,7 @@ void FetcherContext<ActT, WeightT, BiasT>::fetch(const int*      permuted_expert
     auto new_end        = std::unique(permuted_experts_, permuted_experts_ + num_rows_);
     num_active_experts_ = new_end - permuted_experts_;
     // std::cout << "num_active_experts_=" << num_active_experts_ << std::endl;
-
+// 
     if (GlobalConfig::instance().profiling) {
         Profiling::instance().activeExperts(num_active_experts_);
     }
@@ -117,11 +117,11 @@ void FetcherContext<ActT, WeightT, BiasT>::fetch(const int*      permuted_expert
         for (int j = 0; j < 3; j++) {
             if (expert == h_top_3_experts_in_128[layer / 2][j]) {
                 found      = true;
-                expert_idx = j;
+                expert_idx = (layer / 2) * 3 + j;
                 break;
             }
         }
-        // std::cout << "found value " << found <<std::endl;
+        std::cout << "found value " << found <<std::endl;
         if (scales_required) {
             futures_.push_back(GroupedMemoryArena::instance().allocate(
                 layer_name + "expert" + std::to_string(expert),
@@ -140,26 +140,31 @@ void FetcherContext<ActT, WeightT, BiasT>::fetch(const int*      permuted_expert
             // the intermediate working buffer. "reinterpret_cast<char*>(output_working_) + i *
             // output_w_size_per_expert_" is the pointer to the output working buffer. "fetch_weight_src + expert *
             // weight_size_per_expert_" is the pointer to the weight source.
-            // if (!found) {
+            if (!found) {
                 futures_.push_back(GroupedMemoryArena::instance().allocate(
                     layer_name + "expert" + std::to_string(expert),
                     {reinterpret_cast<char*>(intermediate_working_) + i * intermediate_w_size_per_expert_,
                      reinterpret_cast<char*>(output_working_) + i * output_w_size_per_expert_},
                     fetch_weight_src + expert * weight_size_per_expert_));
-            // }
-            // else{
-            //     // 对于在GPU上的权重，执行GPU内存拷贝
-            //     check_cuda_error(cudaMemcpyAsync(intermediate_working_ + i * intermediate_w_size_per_expert_,
-            //                 fc1_expert_weights_stay_on_GPU + expert_idx,
-            //                 intermediate_w_size_per_expert_,
-            //                 cudaMemcpyDeviceToDevice,
-            //                 stream));
-            //     check_cuda_error(cudaMemcpyAsync(output_working_ + i * output_w_size_per_expert_,
-            //                 fc2_expert_weights_stay_on_GPU + expert_idx,
-            //                 output_w_size_per_expert_,
-            //                 cudaMemcpyDeviceToDevice,
-            //                 stream));
-            // }
+            }
+            else{
+                // 对于在GPU上的权重，执行GPU内存拷贝
+                void* intermediate_dest = reinterpret_cast<char*>(intermediate_working_) + i * intermediate_w_size_per_expert_;
+                void* output_dest = reinterpret_cast<char*>(output_working_) + i * output_w_size_per_expert_;
+                printf("intermediate_dest: %p\n", intermediate_dest);
+                printf("fc1_src: %p\n", fc1_expert_weights_stay_on_GPU);
+                printf("expert_idx: %d, size: %d\n", expert_idx, intermediate_w_size_per_expert_);
+                check_cuda_error(cudaMemcpyAsync(intermediate_dest,
+                            reinterpret_cast<const char*>(fc1_expert_weights_stay_on_GPU) + expert_idx * intermediate_w_size_per_expert_,
+                            intermediate_w_size_per_expert_,
+                            cudaMemcpyDeviceToDevice,
+                            stream));
+                check_cuda_error(cudaMemcpyAsync(output_dest,
+                            reinterpret_cast<const char*>(fc2_expert_weights_stay_on_GPU) + expert_idx * output_w_size_per_expert_,
+                            output_w_size_per_expert_,
+                            cudaMemcpyDeviceToDevice,
+                            stream));
+            }
         }
     }
 #ifndef NDEBUG
