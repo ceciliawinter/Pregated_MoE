@@ -109,19 +109,22 @@ void FetcherContext<ActT, WeightT, BiasT>::fetch(const int*      permuted_expert
         const char* fetch_weight_src = prefetch ? next_weight_src_ : current_weight_src_;
         std::string layer_name       = prefetch ? next_layer_name_ : current_layer_name_;
         int layer = prefetch ? layer_num + 2 : layer_num;
+        // printf("layer: %d\n", layer);
         // TODO: ffn_layer_->set_layer("decoder::layer", l, moe_layer_index_);
 
         // 检查当前专家是否在 h_top_3_experts_in_128[layer_now] 中
         bool found      = false;
         int  expert_idx = -1;
-        for (int j = 0; j < 3; j++) {
-            if (expert == h_top_3_experts_in_128[layer / 2][j]) {
-                found      = true;
-                expert_idx = (layer / 2) * 3 + j;
-                break;
+        if(layer != -1){
+            for (int j = 0; j < 3; j++) {
+                if (expert == h_top_3_experts_in_128[layer / 2][j]) {
+                    found      = true;
+                    expert_idx = (layer / 2) * 3 + j;
+                    break;
+                }
             }
+        // std::cout << "found value " << found <<std::endl;
         }
-        std::cout << "found value " << found <<std::endl;
         if (scales_required) {
             futures_.push_back(GroupedMemoryArena::instance().allocate(
                 layer_name + "expert" + std::to_string(expert),
@@ -147,13 +150,14 @@ void FetcherContext<ActT, WeightT, BiasT>::fetch(const int*      permuted_expert
                      reinterpret_cast<char*>(output_working_) + i * output_w_size_per_expert_},
                     fetch_weight_src + expert * weight_size_per_expert_));
             }
+            // printf("fc1_src: %p\n", fc1_expert_weights_stay_on_GPU);
             else{
                 // 对于在GPU上的权重，执行GPU内存拷贝
                 void* intermediate_dest = reinterpret_cast<char*>(intermediate_working_) + i * intermediate_w_size_per_expert_;
                 void* output_dest = reinterpret_cast<char*>(output_working_) + i * output_w_size_per_expert_;
-                printf("intermediate_dest: %p\n", intermediate_dest);
-                printf("fc1_src: %p\n", fc1_expert_weights_stay_on_GPU);
-                printf("expert_idx: %d, size: %d\n", expert_idx, intermediate_w_size_per_expert_);
+                // printf("intermediate_dest: %p\n", intermediate_dest);
+                // printf("fc1_src: %p\n", fc1_expert_weights_stay_on_GPU);
+                // printf("expert_idx: %d, size: %d\n", expert_idx, intermediate_w_size_per_expert_);
                 check_cuda_error(cudaMemcpyAsync(intermediate_dest,
                             reinterpret_cast<const char*>(fc1_expert_weights_stay_on_GPU) + expert_idx * intermediate_w_size_per_expert_,
                             intermediate_w_size_per_expert_,
