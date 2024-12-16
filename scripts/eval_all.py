@@ -178,8 +178,8 @@ def main():
         # "switch-large-128",
     ]
     batch_sizes = [
-        1,
-        # 2,
+        # 1,
+        2,
         # 4,
         # 8,
         # 16,

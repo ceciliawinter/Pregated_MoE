@@ -123,7 +123,7 @@ void FetcherContext<ActT, WeightT, BiasT>::fetch(const int*      permuted_expert
                     break;
                 }
             }
-        // std::cout << "found value " << found <<std::endl;
+        // std::cout << "layer " << layer << "expert id " << expert << " found value " << found <<std::endl;
         }
         if (scales_required) {
             futures_.push_back(GroupedMemoryArena::instance().allocate(
