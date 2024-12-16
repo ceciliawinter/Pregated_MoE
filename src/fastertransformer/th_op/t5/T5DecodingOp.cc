@@ -178,6 +178,8 @@ FTT5Decoding<T>::FTT5Decoding(int64_t                        head_num,
                                 {top_k_experts, output_w_size}, wo_filenames, true));
                         ptr = get_ptr<int8_t>(_weights[_weights.size() - 1]);
                         decoder_layer_weights->ffn_weights.output_weight_stay_on_GPU.kernel = reinterpret_cast<const T*>(ptr);
+                        // printf("decoder_layer_weights->ffn_weights.output_weight_stay_on_GPU.kernel: %p\n", decoder_layer_weights->ffn_weights.output_weight_stay_on_GPU.kernel);
+
                         return;
                     }
                 }
