@@ -1,6 +1,8 @@
 import os
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.colors import LinearSegmentedColormap
+plt.rcParams['font.family'] = 'DejaVu Serif'
 
 def count_experts(file_path, start_line, end_line, remainder):
     expert_num = [0] * 128
@@ -64,23 +66,42 @@ def plot_expert_distribution(group_expert_counts, save_path="expert_distribution
     group_expert_counts = np.array(group_expert_counts)
     # print(f"Shape of group_expert_counts: {group_expert_counts.shape}")
 
+    # # 创建一个自定义的 colormap，白色到深蓝色的渐变
+    # cdict = {
+    #     'red':   [(0.0, 1.0, 1.0),   # 0 -> 白色
+    #               (1.0, 0.0, 0.0)],  # 1 -> 深蓝色
+    #     'green': [(0.0, 1.0, 1.0),   # 0 -> 白色
+    #               (1.0, 0.0, 0.0)],  # 1 -> 深蓝色
+    #     'blue':  [(0.0, 1.0, 1.0),   # 0 -> 白色
+    #               (1.0, 1.0, 1.0)]   # 1 -> 深蓝色
+    # }
+    # custom_cmap = LinearSegmentedColormap('custom_white_to_blue', cdict)
     # 设置图表的大小
     plt.figure(figsize=(12, 6))
 
     # 使用 imshow 绘制热图，横坐标为128个专家，纵坐标为组数
-    plt.imshow(group_expert_counts, aspect='auto', cmap='viridis', origin='lower')
+    # plt.imshow(group_expert_counts, aspect='auto', cmap='viridis', origin='lower')
+    im = plt.imshow(group_expert_counts, aspect='auto', cmap='Blues', origin='lower')
+    plt.colorbar(im, label='Expert Activation Count')
 
     # 添加坐标轴标签
-    plt.xlabel('Expert Number')
-    plt.ylabel('Group Number')
-    plt.title('Distribution of Experts Across Groups')
+    plt.xlabel('Expert ID')
+    plt.ylabel('Decoding Processing')
+    plt.title('Distribution of Experts During Decoding')
 
     # 设置 x 轴的刻度，范围为0到127
     plt.xticks(np.arange(0, 128, 16))  # 每16个专家为一个刻度
-    plt.yticks(np.arange(0, group_expert_counts.shape[0], 1))  # 每一行为一个刻度
+    # plt.yticks(np.arange(0, group_expert_counts.shape[0], 1))  # 每一行为一个刻度
+    
+    # 设置 y 轴的刻度位置
+    plt.yticks(np.arange(group_expert_counts.shape[0]))
+
+    # 设置 y 轴的刻度标签
+    yticks_labels = ['start'] + ['' for _ in range(group_expert_counts.shape[0] - 2)] + ['finish']
+    plt.gca().set_yticklabels(yticks_labels, rotation=90)
 
     # 显示颜色条
-    plt.colorbar(label='Expert Count')
+    # plt.colorbar(label='Expert Count')
 
     # 调整图表布局以防止标签被遮挡
     plt.tight_layout(pad=1.0)
@@ -89,7 +110,7 @@ def plot_expert_distribution(group_expert_counts, save_path="expert_distribution
     plt.savefig(save_path)
 
     # 显示图表
-    plt.show()
+    # plt.show()
 
     # 显式关闭当前图形，避免过多打开的图形
     plt.close()
